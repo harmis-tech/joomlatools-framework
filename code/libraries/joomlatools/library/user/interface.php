@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -80,9 +80,10 @@ interface KUserInterface extends KObjectEquatable
     /**
      * The user has been successfully authenticated
      *
+     * @param  boolean $strict If true, checks if the user has been authenticated for this request explicitly
      * @return Boolean
      */
-    public function isAuthentic();
+    public function isAuthentic($strict = false);
 
     /**
      * Checks whether the user account is enabled.
@@ -97,6 +98,13 @@ interface KUserInterface extends KObjectEquatable
      * @return Boolean
      */
     public function isExpired();
+
+    /**
+     * Sets the user as authenticated for the request
+     *
+     * @return $this
+     */
+    public function setAuthentic();
 
     /**
      * Get an user attribute

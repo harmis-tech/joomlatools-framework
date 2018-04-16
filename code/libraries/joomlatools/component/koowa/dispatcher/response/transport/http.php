@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -29,13 +29,19 @@ class ComKoowaDispatcherResponseTransportHttp extends KDispatcherResponseTranspo
 
         if(!$response->isDownloadable() && $request->getFormat() == 'html')
         {
+            if ($request->getHeaders()->has('X-Flush-Response'))
+            {
+                $layout = 'koowa';
+            }
+            else $layout = $request->query->get('tmpl', 'cmd') == 'koowa' ? 'koowa' : 'joomla';
+
             //Render the page
             $this->getObject('com:koowa.controller.page',  array('response' => $response))
-                ->layout($request->query->get('tmpl', 'cmd') == 'koowa' ? 'koowa' : 'joomla')
+                ->layout($layout)
                 ->render();
 
             //Pass back to Joomla
-            if ($request->isGet() && $request->query->get('tmpl', 'cmd') != 'koowa')
+            if ($request->isGet() && $layout != 'koowa')
             {
                 //Mimetype
                 JFactory::getDocument()->setMimeEncoding($response->getContentType());
@@ -58,7 +64,7 @@ class ComKoowaDispatcherResponseTransportHttp extends KDispatcherResponseTranspo
                         continue;
                     }
 
-                    JResponse::setHeader($parts[0], $parts[1]);
+                    JFactory::getApplication()->setHeader($parts[0], $parts[1]);
                 }
 
                 //Cookies

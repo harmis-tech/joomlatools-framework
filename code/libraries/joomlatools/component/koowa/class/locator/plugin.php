@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -70,9 +70,9 @@ class ComKoowaClassLocatorPlugin extends KClassLocatorAbstract
             $namespace = ucfirst($package);
 
             if(count($parts)) {
-                $path = implode('/', $parts);
+                $file = array_pop($parts);
             } else {
-                $path = $package;
+                $file = $package;
             }
 
             //Switch basepath
@@ -82,7 +82,19 @@ class ComKoowaClassLocatorPlugin extends KClassLocatorAbstract
                 $basepath = $this->getNamespace($namespace);
             }
 
-            return $basepath.'/'.$package.'/'.$path.'.php';
+            $path = '';
+
+            if (!empty($parts)) {
+                $path = implode('/', $parts) . '/';
+            }
+
+            $result = $basepath.'/'.$package.'/'.$path . $file.'.php';
+
+            if(!is_file($result)) {
+                $result = $basepath.'/'.$package.'/'.$path . $file.'/'.$file.'.php';
+            }
+
+            return $result;
         }
 
         return false;

@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -198,7 +198,7 @@ abstract class KTranslatorAbstract extends KObject implements KTranslatorInterfa
 
             $this->getCatalogue()->add($translations, $override);
 
-            $this->_loaded[] = $url;
+            $this->setLoaded($url);
         }
 
         return true;
@@ -325,7 +325,7 @@ abstract class KTranslatorAbstract extends KObject implements KTranslatorInterfa
      */
     public function setCatalogue($catalogue)
     {
-        if(!($catalogue instanceof KModelInterface))
+        if(!($catalogue instanceof KTranslatorCatalogueInterface))
         {
             if(is_string($catalogue) && strpos($catalogue, '.') === false )
             {
@@ -353,7 +353,29 @@ abstract class KTranslatorAbstract extends KObject implements KTranslatorInterfa
      */
     public function isLoaded($url)
     {
-        return in_array($url, $this->_loaded);
+        return in_array($url, $this->getLoaded());
+    }
+
+    /**
+     * Sets a url as loaded.
+     *
+     * @param mixed $url The url.
+     * @return KTranslatorInterface
+     */
+    public function setLoaded($url)
+    {
+        $this->_loaded[] = $url;
+        return $this;
+    }
+
+    /**
+     * Returns a list of loaded urls.
+     *
+     * @return array The loaded urls.
+     */
+    public function getLoaded()
+    {
+        return $this->_loaded;
     }
 
     /**

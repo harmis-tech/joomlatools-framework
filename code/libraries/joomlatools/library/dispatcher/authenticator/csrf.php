@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -82,29 +82,32 @@ class KDispatcherAuthenticatorCsrf extends KDispatcherAuthenticatorAbstract
      */
     public function authenticateRequest(KDispatcherContextInterface $context)
     {
-        $request = $context->request;
-        $user    = $context->user;
-
-        //Check referrer
-        if(!$request->getReferrer()) {
-            throw new KControllerExceptionRequestInvalid('Request Referrer Not Found');
-        }
-
-        //Check csrf token
-        if(!$this->getCsrfToken()) {
-            throw new KControllerExceptionRequestNotAuthenticated('Csrf Token Not Found');
-        }
-
-        //Check cookie token
-        if($this->getCsrfToken() !== $request->cookies->get('csrf_token', 'sha1')) {
-            throw new KControllerExceptionRequestNotAuthenticated('Invalid Cookie Token');
-        }
-
-        if($user->isAuthentic())
+        if (!$context->user->isAuthentic(true))
         {
-            //Check session token
-            if( $this->getCsrfToken() !== $user->getSession()->getToken()) {
-                throw new KControllerExceptionRequestForbidden('Invalid Session Token');
+            $request = $context->request;
+            $user    = $context->user;
+
+            //Check referrer or origin
+            if (!$request->getReferrer() && !$request->getOrigin()) {
+                throw new KControllerExceptionRequestInvalid('Request referrer or origin not found');
+            }
+
+            //Check csrf token
+            if(!$this->getCsrfToken()) {
+                throw new KControllerExceptionRequestNotAuthenticated('Csrf Token Not Found');
+            }
+
+            //Check cookie token
+            if($this->getCsrfToken() !== $request->cookies->get('csrf_token', 'sha1')) {
+                throw new KControllerExceptionRequestNotAuthenticated('Invalid Cookie Token');
+            }
+
+            if($user->isAuthentic())
+            {
+                //Check session token
+                if( $this->getCsrfToken() !== $user->getSession()->getToken()) {
+                    throw new KControllerExceptionRequestForbidden('Invalid Session Token');
+                }
             }
         }
 

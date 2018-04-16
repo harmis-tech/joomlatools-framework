@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -30,9 +30,13 @@ class KTemplateHelperUi extends KTemplateHelperAbstract
             'debug' => false,
             'package' => $identifier->package,
             'domain'  => $identifier->domain,
+            'type'    => $identifier->type,
             'styles' => array(),
+        ))->append(array(
             'wrapper_class' => array(
-                'k-ui-container k-ui-namespace',
+                // Only add k-ui-container for top-level component templates
+                ($config->domain === 'admin' || $config->domain === '') && $config->type === 'com' ? 'k-ui-container' : '',
+                'k-ui-namespace',
                 $identifier->type.'_'.$identifier->package
             ),
         ))->append(array(
@@ -113,6 +117,10 @@ class KTemplateHelperUi extends KTemplateHelperAbstract
         $html .= $this->getTemplate()->helper('behavior.modernizr', $config->toArray());
 
         if (($config->domain === 'admin' || $config->domain === '')  && !KTemplateHelperBehavior::isLoaded('admin.js')) {
+            // Make sure jQuery is always loaded right before admin.js, helps when wrapping components
+            KTemplateHelperBehavior::setLoaded('jquery', false);
+
+            $html .= $this->getTemplate()->helper('behavior.jquery', $config->toArray());
             $html .= '<ktml:script src="assets://js/'.($config->debug ? 'build/' : 'min/').'admin.js" />';
 
             KTemplateHelperBehavior::setLoaded('admin.js');

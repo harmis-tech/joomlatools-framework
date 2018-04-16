@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -229,23 +229,6 @@ abstract class KDispatcherResponseAbstract extends KControllerResponse implement
         $this->_queue->enqueue($transport, $transport->getPriority());
 
         return $this;
-    }
-
-    /**
-     * Returns true if the response is worth caching under any circumstance.
-     *
-     * Responses that are streamable are considered un cacheable.
-     *
-     * @link http://tools.ietf.org/html/rfc2616#section-14.9.1
-     * @return Boolean true if the response is worth caching, false otherwise
-     */
-    public function isCacheable()
-    {
-        if($this->isStreamable()) {
-            return false;
-        }
-
-        return parent::isCacheable();
     }
 
     /**

@@ -7,7 +7,7 @@
  * Added some custom values to classes at the end since we're not including scaffolding.scss
  */
 
-.koowa {
+.k-ui-namespace {
 
   /**
    * Core variables and mixins
@@ -151,7 +151,7 @@
    * ---------------------
    */
 
-  .koowa .nav-tabs>li {
+  .k-ui-namespace .nav-tabs>li {
     margin-bottom: -1px !important;
   }
 

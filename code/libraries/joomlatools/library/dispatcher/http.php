@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -335,8 +335,9 @@ class KDispatcherHttp extends KDispatcherAbstract implements KObjectInstantiable
     /**
      * Options method
      *
+     * Adds Allow header. Example output: `Allow: GET, POST, PUT, DELETE`
+     *
      * @param   KDispatcherContextInterface $context    A dispatcher context object
-     * @return  string  The allowed actions; e.g., `GET, POST [add, edit, cancel, save], PUT, DELETE`
      */
     protected function _actionOptions(KDispatcherContextInterface $context)
     {
@@ -355,37 +356,11 @@ class KDispatcherHttp extends KDispatcherAbstract implements KObjectInstantiable
         foreach($actions as $action)
         {
             if($this->canExecute($action)) {
-                $methods[$action] = $action;
+                $methods[] = strtoupper($action);
             }
         }
 
-        //Retrieve POST actions allowed by the controller
-        if(in_array('post', $methods))
-        {
-            $actions = array_diff($this->getController()->getActions(), array('browse', 'read', 'render'));
-            foreach($actions as $key => $action)
-            {
-                if(!$this->getController()->canExecute($action)) {
-                    unset($actions[$key]);
-                }
-            }
-
-            sort($actions);
-
-            $methods['post'] = array_diff($actions, $methods);
-        }
-
-        //Render to string
-        $result = '';
-        foreach($methods as $method => $actions)
-        {
-            $result .= strtoupper($method). ' ';
-            if(is_array($actions) && !empty($actions)) {
-                $result .= '['.implode(', ', $actions).'] ';
-            }
-        }
-
-        $context->response->headers->set('Allow', $result);
+        $context->response->headers->set('Allow', implode(', ', $methods));
     }
 
     /**

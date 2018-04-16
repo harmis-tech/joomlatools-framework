@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -19,6 +19,13 @@
  */
 class KUser extends KUserAbstract implements KObjectSingleton
 {
+    /**
+     * User authentication status for this request
+     *
+     * @var bool
+     */
+    protected $_authentic = false;
+
     /**
      * Get the user session
      *
@@ -109,11 +116,18 @@ class KUser extends KUserAbstract implements KObjectSingleton
     /**
      * Checks whether the user is not logged in
      *
+     * @param  boolean $strict If true, checks if the user has been authenticated for this request explicitly
      * @return Boolean true if the user is not logged in, false otherwise
      */
-    public function isAuthentic()
+    public function isAuthentic($strict = false)
     {
-        return $this->getSession()->get('user.authentic');
+        $result = $this->getSession()->get('user.authentic');
+
+        if ($strict) {
+            $result = $result && $this->_authentic;
+        }
+
+        return $result;
     }
 
     /**
@@ -134,6 +148,20 @@ class KUser extends KUserAbstract implements KObjectSingleton
     public function isExpired()
     {
         return $this->getSession()->get('user.expired');
+    }
+
+    /**
+     * Sets the user as authenticated for the request
+     *
+     * @return $this
+     */
+    public function setAuthentic()
+    {
+        $this->_authentic = true;
+
+        $this->getSession()->set('user.authentic', true);
+
+        return $this;
     }
 
     /**
@@ -165,13 +193,13 @@ class KUser extends KUserAbstract implements KObjectSingleton
     /**
      * Get an user attribute
      *
-     * @param   string  $identifier Attribute identifier, eg .foo.bar
+     * @param   string  $identifier Attribute identifier, eg foo.bar
      * @param   mixed   $default    Default value when the attribute doesn't exist
      * @return  mixed   The value
      */
     public function get($identifier, $default = null)
     {
-        return $this->getSession()->get('user.attributes'.$identifier, $default);
+        return $this->getSession()->get('user.attributes.'.$identifier, $default);
     }
 
     /**
@@ -183,7 +211,7 @@ class KUser extends KUserAbstract implements KObjectSingleton
      */
     public function set($identifier, $value)
     {
-        $this->getSession()->set('user.attributes'.$identifier, $value);
+        $this->getSession()->set('user.attributes.'.$identifier, $value);
         return $this;
     }
 
@@ -195,7 +223,7 @@ class KUser extends KUserAbstract implements KObjectSingleton
      */
     public function has($identifier)
     {
-        return $this->getSession()->has('user.attributes'.$identifier);
+        return $this->getSession()->has('user.attributes.'.$identifier);
     }
 
     /**
@@ -206,7 +234,7 @@ class KUser extends KUserAbstract implements KObjectSingleton
      */
     public function remove($identifier)
     {
-        $this->getSession()->remove('user.attributes'.$identifier);
+        $this->getSession()->remove('user.attributes.'.$identifier);
         return $this;
     }
 

@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -174,11 +174,6 @@ class KTemplateHelperGrid extends KTemplateHelperAbstract implements KTemplateHe
         $html .= '<span class="k-visually-hidden">' . $this->getObject('translator')->translate('Clear search') . '</span>';
         $html .= '</span>';
         $html .= '</button>';
-
-        if ($config->search) {
-            $html .= '<div class="k-scopebar__item-label k-scopebar__item-label--numberless"></div>';
-        }
-
         $html .= '</div>';
 
 
@@ -232,7 +227,7 @@ class KTemplateHelperGrid extends KTemplateHelperAbstract implements KTemplateHe
         $query['direction'] = ($direction == 'desc' ? 'asc' : 'desc'); // toggle
         $url->setQuery($query);
 
-        $html  = '<a href="'.$url.'" data-k-tooltip=\'{"container":".koowa-container","delay":{"show":500,"hide":50}}\' data-original-title="'.$translator->translate('Click to sort by this column').'">';
+        $html  = '<a href="'.$url.'" data-k-tooltip=\'{"container":".k-ui-container","delay":{"show":500,"hide":50}}\' data-original-title="'.$translator->translate('Click to sort by this column').'">';
         $html .= $translator->translate($config->title);
 
         if($config->column == $config->sort)
@@ -280,14 +275,14 @@ class KTemplateHelperGrid extends KTemplateHelperAbstract implements KTemplateHe
         if ($config->clickable)
         {
             $data = htmlentities(json_encode($config->data->toArray()));
-            $tooltip = 'data-k-tooltip=\'{"container":".koowa-container","delay":{"show":500,"hide":50}}\'
+            $tooltip = 'data-k-tooltip=\'{"container":".k-ui-container","delay":{"show":500,"hide":50}}\'
             style="cursor: pointer"
             data-action="edit" 
             data-data="'.$data.'" 
             data-original-title="'.$config->tooltip.'"';
         }
 
-        $html = '<spaan class="k-table__item--state '.$class.'" '.$tooltip.'>'.$config->alt.'</span>';
+        $html = '<span class="k-table__item--state '.$class.'" '.$tooltip.'>'.$config->alt.'</span>';
 
         return $html;
     }

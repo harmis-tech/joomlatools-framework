@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -600,13 +600,58 @@ abstract class KDispatcherRequestAbstract extends KControllerRequest implements 
 
         if(isset($this->_referrer) && $isInternal)
         {
-            $url = $this->_referrer->toString(KHttpUrl::SCHEME | KHttpUrl::HOST);
-            if(!$this->getObject('lib:filter.internalurl')->validate($url)) {
-                return null;
+            $target_origin = $this->getUrl()->getHost();
+            $source_origin = $this->_referrer->getHost();
+
+            // Check if the source matches the target
+            if($target_origin !== $source_origin)
+            {
+                // Special case: check if the source is a subdomain of the target origin
+                if ('.'.$target_origin !== substr($source_origin, -1 * (strlen($target_origin)+1))) {
+                    return null;
+                }
             }
         }
 
         return $this->_referrer;
+    }
+
+    /**
+     * Returns the HTTP origin header.
+     *
+     * @param   boolean  $isInternal Only allow internal URLs
+     * @return  KHttpUrl|null  A HttpUrl object or NULL if no origin header could be found
+     */
+    public function getOrigin($isInternal = true)
+    {
+        $origin = null;
+
+        if ($this->_headers->has('Origin'))
+        {
+            try {
+                $origin = $this->getObject('lib:http.url', [
+                    'url' => $this->getObject('lib:filter.url')->sanitize($this->_headers->get('Origin'))
+                ]);
+
+                if($isInternal)
+                {
+                    $target_origin = $this->getUrl()->getHost();
+                    $source_origin = $origin->getHost();
+
+                    // Check if the source matches the target
+                    if($target_origin !== $source_origin)
+                    {
+                        // Special case: check if the source is a subdomain of the target origin
+                        if ('.'.$target_origin !== substr($source_origin, -1 * (strlen($target_origin)+1))) {
+                            $origin = null;
+                        }
+                    }
+                }
+            }
+            catch (UnexpectedValueException $e) {}
+        }
+
+        return $origin;
     }
 
     /**
@@ -936,10 +981,11 @@ abstract class KDispatcherRequestAbstract extends KControllerRequest implements 
      */
     public function isSecure()
     {
+        // Some servers are configured to return as X-Forwarded-Proto but they are missing X-Forwarded-By.
         if ($this->isProxied() && $this->_headers->has('X-Forwarded-Proto')) {
-            $scheme  = $this->_headers->get('X-Forwarded-Proto');
+            $scheme = $this->_headers->get('X-Forwarded-Proto');
         } else {
-           $scheme  = isset($_SERVER['HTTPS']) ? strtolower($_SERVER['HTTPS']) : 'http';
+            $scheme = isset($_SERVER['HTTPS']) ? strtolower($_SERVER['HTTPS']) : 'http';
         }
 
         return in_array(strtolower($scheme), array('https', 'on', '1'));

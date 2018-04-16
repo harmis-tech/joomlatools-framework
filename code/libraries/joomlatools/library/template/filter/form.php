@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -74,9 +74,29 @@ class KTemplateFilterForm extends KTemplateFilterAbstract
      */
     public function filter(&$text)
     {
+        //$this->_addMetatag($text);
         $this->_addAction($text);
         $this->_addToken($text);
         $this->_addQueryParameters($text);
+
+        return $this;
+    }
+
+    /**
+     * Adds the CSRF token to a meta tag to be used in JavaScript
+     *
+     * @param string $text Template text
+     * @return $this
+     */
+    protected function _addMetatag(&$text)
+    {
+        if (!empty($this->_token_value))
+        {
+            $string = '<meta content="'.$this->_token_value.'" name="csrf-token" />';
+            if (stripos($text, $string) === false) {
+                $text = $string.$text;
+            }
+        }
 
         return $this;
     }

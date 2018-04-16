@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -100,6 +100,14 @@ interface KDispatcherRequestInterface extends KControllerRequestInterface
      * @return  KHttpUrl A HttpUrl object
      */
     public function getReferrer($isInternal = true);
+
+    /**
+     * Returns the HTTP origin header.
+     *
+     * @param   boolean  $isInternal Only allow internal URLs
+     * @return  KHttpUrl|null  A HttpUrl object or NULL if no origin header could be found
+     */
+    public function getOrigin($isInternal = true);
 
     /**
      * Returns the client information doing the request

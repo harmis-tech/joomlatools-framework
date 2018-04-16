@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -42,6 +42,8 @@ class ComKoowaTemplateHelperEvent extends KTemplateHelperAbstract
 
         $results = JDispatcher::getInstance()->trigger($config->name, $attributes);
         $result  = trim(implode("\n", $results));
+        // Leave third party JavaScript as-is
+        $result  = str_replace('<script', '<script data-inline', $result);
 
         return $result;
     }

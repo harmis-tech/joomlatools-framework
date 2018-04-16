@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -256,16 +256,24 @@ abstract class KUserSessionContainerAbstract extends KObjectArray implements KUs
      */
     public function offsetExists($identifier)
     {
-        $keys = $this->_parseIdentifier($identifier);
+        $keys   = $this->_parseIdentifier($identifier);
+        $last   = count($keys)-1;
+        $data   = &$this->_data;
+        $result = false;
 
-        foreach($keys as $key)
+        foreach($keys as $index => $key)
         {
-            if(array_key_exists($key, $this->_data)) {
-                return true;
-            };
+            if (!array_key_exists($key, $data)) {
+                break;
+            }
+
+            if ($index < $last) {
+                $data =& $data[$key];
+            }
+            else $result = true;
         }
 
-        return false;
+        return $result;
     }
 
     /**
@@ -277,14 +285,19 @@ abstract class KUserSessionContainerAbstract extends KObjectArray implements KUs
     public function offsetUnset($identifier)
     {
         $keys = $this->_parseIdentifier($identifier);
+        $last = count($keys)-1;
+        $data =& $this->_data;
 
-        foreach($keys as $key)
+        foreach($keys as $index => $key)
         {
-            if(array_key_exists($key, $this->_data))
-            {
-                unset($this->_data[$key]);
+            if (!array_key_exists($key, $data)) {
                 break;
-            };
+            }
+
+            if ($index < $last) {
+                $data =& $data[$key];
+            }
+            else unset($data[$key]);
         }
     }
 

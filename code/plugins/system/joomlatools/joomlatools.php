@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -129,11 +129,16 @@ class PlgSystemJoomlatools extends JPlugin
                 /**
                  * Component Bootstrapping
                  */
-                KObjectManager::getInstance()->getObject('object.bootstrapper')
+                $bootstrapper = KObjectManager::getInstance()->getObject('object.bootstrapper')
                     ->registerComponents(JPATH_LIBRARIES . '/joomlatools/component', 'koowa')
                     ->registerApplication('site', JPATH_SITE . '/components', JFactory::getApplication()->isSite())
-                    ->registerApplication('admin', JPATH_ADMINISTRATOR . '/components', JFactory::getApplication()->isAdmin())
-                    ->bootstrap();
+                    ->registerApplication('admin', JPATH_ADMINISTRATOR . '/components', JFactory::getApplication()->isAdmin());
+
+                if (is_dir(JPATH_LIBRARIES . '/joomlatools-components')) {
+                    $bootstrapper->registerComponents(JPATH_LIBRARIES . '/joomlatools-components', 'koowa');
+                }
+
+                $bootstrapper->bootstrap();
             }
 
             $manager = KObjectManager::getInstance();
@@ -157,7 +162,7 @@ class PlgSystemJoomlatools extends JPlugin
              */
             $loader->registerLocator(new ComKoowaClassLocatorPlugin(array(
                 'namespaces' => array(
-                    '\\'     => JPATH_ROOT.'/plugins',
+                    '\\'     => JPATH_PLUGINS,
                     'Koowa'  => JPATH_LIBRARIES.'/joomlatools/plugin',
                 )
             )));

@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -96,7 +96,6 @@ class KTemplateHelperActionbar extends KTemplateHelperToolbar
 
         $command->attribs->class->append(array('k-button', 'k-button--default', 'k-button-'.$command->id));
 
-        $icon = $this-> _getIconClass($command->icon);
         if ($command->id === 'new' || $command->id === 'apply') {
             $command->attribs->class->append(array('k-button--success'));
         }
@@ -106,10 +105,7 @@ class KTemplateHelperActionbar extends KTemplateHelperToolbar
 
         $html = '<a '.$this->buildAttributes($attribs).'>';
 
-        if ($this->_useIcons()) {
-            $html .= '<span class="'.$icon.'" aria-hidden="true"></span> ';
-        }
-
+        $html .= '<span class="'.$command->icon.'" aria-hidden="true"></span> ';
         $html .= $translator->translate($command->label);
         $html .= '</a>';
 
@@ -148,26 +144,5 @@ class KTemplateHelperActionbar extends KTemplateHelperToolbar
         $html = $this->command($config);
 
         return $html;
-    }
-
-    /**
-     * Decides if Bootstrap buttons should use icons
-     *
-     * @return bool
-     */
-    protected function _useIcons()
-    {
-        return true;
-    }
-
-    /**
-     * Allows to map the icon classes to different ones
-     *
-     * @param  string $icon Action bar icon
-     * @return string Icon class
-     */
-    protected function _getIconClass($icon)
-    {
-        return $icon;
     }
 }

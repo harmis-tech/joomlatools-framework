@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -176,9 +176,10 @@ abstract class KUserAbstract extends KObject implements KUserInterface
     /**
      * The user has been successfully authenticated
      *
+     * @param  boolean $strict If true, checks if the user has been authenticated for this request explicitly
      * @return Boolean
      */
-    public function isAuthentic()
+    public function isAuthentic($strict = false)
     {
         return $this->getData()->authentic;
     }
@@ -201,6 +202,18 @@ abstract class KUserAbstract extends KObject implements KUserInterface
     public function isExpired()
     {
         return $this->getData()->expired;
+    }
+
+    /**
+     * Sets the user as authenticated for the request
+     *
+     * @return $this
+     */
+    public function setAuthentic()
+    {
+        $this->getData()->authentic = true;
+
+        return $this;
     }
 
     /**

@@ -358,14 +358,14 @@
 // Three mixins for RTL
 // - `@include rtl` to use inside the Koowa namespace but outside the Modernizr namespace
 // - `@include modernizr-rtl` to use outside Modernizr otherwise the mixin will fail
-// - `@include rtl-outside-koowa` to be used for @imports outside the Koowa namespace
+// - `@include rtl-outside-koowa` to be used for @imports outside the k-ui-namespace namespace
 //
 // What to watch out for when styling RTL in Nooku UI:
 // ===================================================
 //
 // 1. Namespacing
 // --------------
-// Use the `rtl-outside-koowa` Mixin outside the koowa namspace
+// Use the `rtl-outside-koowa` Mixin outside k-ui-namespace namspace
 //
 //
 // 2. Modernizr
@@ -395,23 +395,23 @@
 // Will result in:
 //
 // ```
-// .koowa .foo {
+// .k-ui-namespace .foo {
 //   padding-left: 10px;
 // }
 //
-// .koowa--rtl.koowa .foo {
+// .k-ui-rtl.koowa .foo {
 //   padding-left: 0;
 //   padding-right: 10px;
 // }
 //
 // @media (min-width: 600px) {
-//   .koowa .foo {
+//   .k-ui-namespace .foo {
 //     padding-left: 20px;
 //   }
 // }
 // ```
 //
-// Since the `.koowa--rtl.koowa` .foo has a higher specificity than the media querie, the RTL styling will be there for non-rtl as well. So watch out for specificity and do this:
+// Since the `.k-ui-rtl.koowa` .foo has a higher specificity than the media querie, the RTL styling will be there for non-rtl as well. So watch out for specificity and do this:
 //
 // ```
 // .foo {
@@ -470,7 +470,7 @@
 
 
 @mixin rtl {
-  @at-root .koowa--rtl#{&} {
+  @at-root .k-ui-rtl#{&} {
     @content;
   }
 }
@@ -485,7 +485,7 @@
 
 @mixin modernizr-rtl($classes) {
   @at-root {
-    #{$classes} .koowa--rtl#{&} {
+    #{$classes} .k-ui-rtl#{&} {
       @content
     }
   }

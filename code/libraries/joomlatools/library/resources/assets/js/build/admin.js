@@ -8297,7 +8297,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
 
 /*>>retina*/
  _checkInstance(); }));
-/*!
+(function($) { var jQuery = $;/*!
  * FooTable - Awesome Responsive Tables
  * Version : 2.0.3
  * http://fooplugins.com/plugins/footable-jquery/
@@ -9121,7 +9121,7 @@ $.magnificPopup.registerModule(RETINA_NS, {
         return ft;
     }
 })(jQuery, window);
-
+})(jQuery);
 /*
 JqTree 1.3.4
 
@@ -13297,7 +13297,24 @@ module.exports = '1.3.4';
   , hide: function () {
       var that = this
         , $tip = this.tip()
-        , e = $.Event('hide')
+        , e = $.Event('hide');
+
+
+      // Bootstrap tooltips emit a "hide" event on tooltip trigger element and MooTools runs hide() on it
+      // Make sure MooTools doesn't hide the tooltip trigger elements after hiding the tooltip box
+      if (typeof window.MooTools !== 'undefined' && !this.mootools_compatible) {
+          var mHide = window.Element.prototype.hide;
+          window.Element.implement({
+              hide: function() {
+                  if ($(this).data('ktooltip')) {
+                      return this;
+                  }
+                  mHide.apply(this, arguments);
+              }
+          });
+
+          this.mootools_compatible = true;
+      }
 
       this.$element.trigger(e)
       if (e.isDefaultPrevented()) return
@@ -14043,7 +14060,7 @@ module.exports = '1.3.4';
                     tooltip = tooltip.replace('%s', item.data('title'));
 
                     dropdown_button.ktooltip({
-                        "container":".koowa-container",
+                        "container":".k-ui-container",
                         "delay":{"show":500,"hide":50},
                         'title': tooltip
                     });
@@ -14267,11 +14284,11 @@ module.exports = '1.3.4';
 
 } (window, document, kQuery));
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
  * @copyright	Copyright (C) 2015 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link		https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link		https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 if(!Koowa) {
@@ -14436,11 +14453,11 @@ Koowa.Class = klass({
 })(window.kQuery);
 
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
  * @copyright	Copyright (C) 2015 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link		https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link		https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 if (typeof Koowa === 'undefined') {
@@ -14616,7 +14633,7 @@ $(function() {
  *
  * @copyright	Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link		https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link		https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  * @requires    Koowa.Class, jqTree plugin
  */
 
@@ -15281,7 +15298,7 @@ $(function() {
 			this._detachEvents();
 			this._detachSecondaryEvents();
 			this.picker.remove();
-			delete this.element.data().datepicker;
+			delete this.element.data().kdatepicker;
 			if (!this.isInput) {
 				delete this.element.data().date;
 			}
@@ -15962,10 +15979,10 @@ $(function() {
 		delete options.inputs;
 
 		$(this.inputs)
-			.datepicker(options)
+			.kdatepicker(options)
 			.bind('changeDate', $.proxy(this.dateUpdated, this));
 
-		this.pickers = $.map(this.inputs, function(i){ return $(i).data('datepicker'); });
+		this.pickers = $.map(this.inputs, function(i){ return $(i).data('kdatepicker'); });
 		this.updateDates();
 	};
 	DateRangePicker.prototype = {
@@ -15980,7 +15997,7 @@ $(function() {
 			});
 		},
 		dateUpdated: function(e){
-			var dp = $(e.target).data('datepicker'),
+			var dp = $(e.target).data('kdatepicker'),
 				new_date = dp.getUTCDate(),
 				i = $.inArray(e.target, this.inputs),
 				l = this.inputs.length;
@@ -16002,7 +16019,7 @@ $(function() {
 		},
 		remove: function(){
 			$.map(this.pickers, function(p){ p.remove(); });
-			delete this.element.data().datepicker;
+			delete this.element.data().kdatepicker;
 		}
 	};
 
@@ -16038,15 +16055,15 @@ $(function() {
 		return out;
 	}
 
-	var old = $.fn.datepicker;
-	$.fn.datepicker = function ( option ) {
+	var old = $.fn.kdatepicker;
+	$.fn.kdatepicker = function ( option ) {
 		var args = Array.apply(null, arguments);
 		args.shift();
 		var internal_return,
 			this_return;
 		this.each(function () {
 			var $this = $(this),
-				data = $this.data('datepicker'),
+				data = $this.data('kdatepicker'),
 				options = typeof option == 'object' && option;
 			if (!data) {
 				var elopts = opts_from_el(this, 'date'),
@@ -16059,10 +16076,10 @@ $(function() {
 					var ropts = {
 						inputs: opts.inputs || $this.find('input').toArray()
 					};
-					$this.data('datepicker', (data = new DateRangePicker(this, $.extend(opts, ropts))));
+					$this.data('kdatepicker', (data = new DateRangePicker(this, $.extend(opts, ropts))));
 				}
 				else{
-					$this.data('datepicker', (data = new Datepicker(this, opts)));
+					$this.data('kdatepicker', (data = new Datepicker(this, opts)));
 				}
 			}
 			if (typeof option == 'string' && typeof data[option] == 'function') {
@@ -16077,7 +16094,7 @@ $(function() {
 			return this;
 	};
 
-	var defaults = $.fn.datepicker.defaults = {
+	var defaults = $.fn.kdatepicker.defaults = {
 		autoclose: false,
 		beforeShowDay: $.noop,
 		calendarWeeks: false,
@@ -16098,13 +16115,13 @@ $(function() {
 		weekStart: 0,
 		parentEl: 'body'
 	};
-	var locale_opts = $.fn.datepicker.locale_opts = [
+	var locale_opts = $.fn.kdatepicker.locale_opts = [
 		'format',
 		'rtl',
 		'weekStart'
 	];
-	$.fn.datepicker.Constructor = Datepicker;
-	var dates = $.fn.datepicker.dates = {
+	$.fn.kdatepicker.Constructor = Datepicker;
+	var dates = $.fn.kdatepicker.dates = {
 		en: {
 			days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
 			daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -16329,14 +16346,14 @@ $(function() {
 							'</div>'+
 						'</div>';
 
-	$.fn.datepicker.DPGlobal = DPGlobal;
+	$.fn.kdatepicker.DPGlobal = DPGlobal;
 
 
 	/* DATEPICKER NO CONFLICT
 	* =================== */
 
-	$.fn.datepicker.noConflict = function(){
-		$.fn.datepicker = old;
+	$.fn.kdatepicker.noConflict = function(){
+		$.fn.kdatepicker = old;
 		return this;
 	};
 
@@ -16349,14 +16366,14 @@ $(function() {
 		'[data-provide="datepicker"]',
 		function(e){
 			var $this = $(this);
-			if ($this.data('datepicker')) return;
+			if ($this.data('kdatepicker')) return;
 			e.preventDefault();
 			// component click requires us to explicitly show it
-			$this.datepicker('show');
+			$this.kdatepicker('show');
 		}
 	);
 	$(function(){
-		$('[data-provide="datepicker-inline"]').datepicker();
+		$('[data-provide="datepicker-inline"]').kdatepicker();
 	});
 
 }( window.kQuery ));
@@ -16968,27 +16985,15 @@ var Konami = function (callback) {
     return konami;
 };
 (function($) {
-    // Bootstrap tooltips emit a "hide" event on tooltip trigger element and MooTools runs hide() on it
-    // Make sure MooTools doesn't hide the tooltip trigger elements after hiding the tooltip box
-    if (typeof MooTools !== 'undefined') {
-        var mHide = Element.prototype.hide;
-        Element.implement({
-            hide: function() {
-                if ($(this).is('[data-k-tooltip]')) {
-                    return this;
-                }
-                mHide.apply(this, arguments);
-            }
-        });
-    }
 
     $(document).ready(function () {
 
         // Variables
-        var $fixedtable = $('.k-js-fixed-table-header'),
-            $footable = $('.k-js-responsive-table'),
+        var $footable = $('.k-js-responsive-table'),
             $sidebarToggle = $('.k-js-sidebar-toggle-item'),
-            $scopebar = $('.k-js-scopebar');
+            $scopebar = $('.k-js-scopebar'),
+            resizeTimer,
+            resizeClass = 'k-is-resizing';
 
         // Sidebar
         if ($('.k-js-title-bar, .k-js-toolbar').length && $('.k-js-wrapper').length && $('.k-js-content').length)
@@ -17003,7 +17008,7 @@ var Konami = function (callback) {
 
             function addOffCanvasButton(element, position) {
                 // Variables
-                var kContainer = '.koowa-container',
+                var kContainer = '.k-ui-container',
                     container = element.closest(kContainer),
                     titlebar = container.find('.k-js-title-bar'),
                     toolbar = container.find('.k-js-toolbar'),
@@ -17093,6 +17098,103 @@ var Konami = function (callback) {
             }
         }
 
+
+
+        // Initiate responsive top menu
+
+        // Menu itself
+        var $menu = $('#k-js-menu');
+
+        // See if it exists
+        if ($menu.length) {
+
+            // Variables
+            var $menuItem = $('#k-js-menu > ul > li > a'),
+                menuClass = 'has-open-menu',
+                submenuClass = 'has-open-submenu';
+
+            var toggle_button = '<button type="button" id="k-js-menu-toggle" class="menu-toggle" title="Menu toggle" aria-label="Menu toggle">Menu</button>';
+            var offcanvasoverlay = '<div class="k-off-canvas-overlay"></div>';
+
+            // Append toggle button and overlay
+            $menu.parent().append($(toggle_button));
+            $('.k-js-wrapper').append($(offcanvasoverlay));
+
+            // Off canvas
+            $menu.offCanvasMenu({
+                menuToggle: $('#k-js-menu-toggle'),
+                position: 'right',
+                container: $('.k-wrapper'),
+                expandedWidth: '276',
+                wrapper: $('.k-ui-container')
+            });
+
+            // Click a menu item
+            function clickMenuItem($element) {
+                $element.on('click', function(event) {
+                    if (!$(this).next('ul').length) return;
+                    event.preventDefault();
+                    if ( $menu.hasClass(menuClass) && $(this).hasClass(submenuClass) ) {
+                        closeMenu();
+                    } else {
+                        openMenuItem($(this));
+                    }
+                });
+            }
+
+            // Open a menu item
+            function openMenuItem($element) {
+                if ( $menu.hasClass(menuClass) && $(this).hasClass(submenuClass) ) {
+                    closeMenu();
+                } else {
+                    $('.' + submenuClass).removeClass(submenuClass);
+                    $element.addClass(submenuClass);
+                    $menu.addClass(menuClass);
+                }
+            }
+
+            // Hover a menu item
+            function hoverMenuItem() {
+                $menuItem.on('mouseover', function(event) {
+                    // Only on desktop
+                    if ( $('.k-menu-container').css('z-index') >= 9 ) {
+                        event.preventDefault();
+                        if ( $menu.hasClass(menuClass) ) {
+                            $menu.find('.' + submenuClass).blur();
+                            openMenuItem($(this));
+                        }
+                    }
+                });
+            }
+
+            // Close all items
+            function closeMenu() {
+                $menu.removeClass(menuClass).find('.' + submenuClass).removeClass(submenuClass);
+            }
+
+            // Initiate
+            clickMenuItem($menuItem);
+            hoverMenuItem();
+
+            // On clicking next to the menu
+            $(document).mouseup(function(e) {
+                var $navigationList = $('.k-menu-container__nav > ul');
+
+                // if the target of the click isn't the container nor a descendant of the container
+                if (!$navigationList.is(e.target) && $navigationList.has(e.target).length === 0)
+                {
+                    closeMenu();
+                }
+            });
+
+            // On ESC key
+            $(document).keyup(function(e) {
+                if (e.keyCode === 27) {
+                    closeMenu();
+                }
+            });
+        }
+
         // Footable
         $footable.footable({
             toggleSelector: '.footable-toggle',
@@ -17101,26 +17203,7 @@ var Konami = function (callback) {
                 tablet: 600,
                 desktop: 800
             }
-        }).bind('footable_resizing', function() {
-            $fixedtable.floatThead('destroy');
-        }).bind('footable_resized', function() {
-            fixedTable();
-            $fixedtable.floatThead('reflow');
         });
-
-        // Sticky table header and footer
-        function fixedTable() {
-            if ( $fixedtable.length ) {
-                $fixedtable.floatThead({
-                    scrollContainer: function($table){
-                        return $table.closest('.k-table');
-                    },
-                    position: 'absolute'
-                });
-            }
-        }
-
-        fixedTable();
 
         // Filter and search toggle buttons in the scopebar
         if ( $scopebar.length ) {
@@ -17176,7 +17259,7 @@ var Konami = function (callback) {
         });
 
         // Datepicker
-        $('.k-js-datepicker').datepicker();
+        $('.k-js-datepicker').kdatepicker();
 
         // Magnific
         $('.k-js-image-modal').magnificPopup({type:'image'});
@@ -17188,22 +17271,7 @@ var Konami = function (callback) {
             animation: true,
             placement: 'top',
             delay: { show: 200, hide: 50 },
-            container: '.koowa-container'
-        });
-
-        // Add a class during resizing event so we can hide overflowing stuff
-        var resizeTimer,
-            resizeClass = 'k-is-resizing';
-
-        $(window).on('resize', function() {
-            $('body').addClass(resizeClass);
-
-            // Remove the class when resize is done
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                $('body').removeClass(resizeClass);
-                $fixedtable.floatThead('reflow');
-            }, 250);
+            container: '.k-ui-container'
         });
 
         // Sidebar block toggle (e.g. quick filters)
@@ -17219,7 +17287,7 @@ var Konami = function (callback) {
 
         // Konami
         new Konami(function() {
-            $('html, .koowa-container').css({
+            $('html, .k-ui-container').css({
                 'font-family': 'Comic Sans MS',
                 'font-size': '20px',
                 'line-height': '30px'
@@ -17236,6 +17304,187 @@ var Konami = function (callback) {
                 {"label":"Sub category 3","id":8,"parent":4}
             ]
         });
+
+        // Tabs scroller
+        var $tabsScroller = $('.k-js-tabs-scroller'),
+            tabsOverflowClass = 'k-has-tabs-overflow',
+            tabsOverflowLeftClass = 'k-has-tabs-left-overflow',
+            tabsOverflowRightClass = 'k-has-tabs-right-overflow',
+            tabsScrollAmount = 0.8,
+            tabsAnimationSpeed = 400;
+
+        // Calculate wether there is a scrollable area and apply classes accordingly
+        function tabsCalculateScroll() {
+
+            if (!$tabsScroller.length) return;
+
+            // Variables
+            var tabsWidth = $tabs.outerWidth(),
+                scrollerWidth = $tabsScroller.innerWidth(),
+                scrollLeft = $tabsScroller.scrollLeft();
+
+            // Show / hide buttons
+            if (tabsWidth > scrollerWidth) {
+                $tabsWrapper.addClass(tabsOverflowClass);
+            } else {
+                $tabsWrapper.removeClass(tabsOverflowClass);
+            }
+
+            // "Activate" left button
+            if ((tabsWidth > scrollerWidth) && (scrollLeft > 0)) {
+                $tabsWrapper.addClass(tabsOverflowLeftClass);
+            }
+
+            // "Activate" right button
+            if ((tabsWidth > scrollerWidth)) {
+                $tabsWrapper.addClass(tabsOverflowRightClass);
+            }
+
+            // "Deactivate" left button
+            if ((tabsWidth <= scrollerWidth) || (scrollLeft <= 0)) {
+                $tabsWrapper.removeClass(tabsOverflowLeftClass);
+            }
+
+            // "Deactivate" right button
+            if ((tabsWidth <= scrollerWidth) || (scrollLeft >= (tabsWidth - scrollerWidth))) {
+                $tabsWrapper.removeClass(tabsOverflowRightClass);
+            }
+        }
+
+        // Only run if scroller exists
+        if ( $tabsScroller.length ) {
+
+            // Variables
+            var $tabs = $('.k-js-tabs'),
+                $tabsWrapper = $('.k-js-tabs-wrapper');
+
+            // Append buttons
+            $tabsWrapper.prepend('<button type="button" class="k-tabs-scroller-prev"><span class="k-icon-chevron-left"></span><span class="k-visually-hidden">Scroll left</span></button>');
+            $tabsWrapper.append('<button type="button" class="k-tabs-scroller-next"><span class="k-icon-chevron-right"></span><span class="k-visually-hidden">Scroll right</span></button>');
+
+            // Clicking left and right buttons
+            function tabsScrollButtonClick() {
+
+                // Buttons
+                var $tabsPrev = $('.k-tabs-scroller-prev'),
+                    $tabsNext = $('.k-tabs-scroller-next');
+
+                // Prev
+                $tabsPrev.on('click', function() {
+                    calculateScroll('prev');
+                });
+
+                // Next
+                $tabsNext.on('click', function() {
+                    calculateScroll('next');
+                });
+            }
+
+            // Calculate the amount of scrolling to do
+            function calculateScroll(direction) {
+
+                // Variables
+                var tabsWidth = $tabs.outerWidth(),
+                    scrollerWidth = $tabsScroller.innerWidth(),
+                    scrollLeft = $tabsScroller.scrollLeft(),
+                    scroll;
+
+                // Left button (scroll to right)
+                if ( direction == 'prev') {
+                    scroll = scrollLeft - (scrollerWidth * tabsScrollAmount);
+                    if (scroll < 0 ) {
+                        scroll = 0;
+                    }
+                }
+
+                // Right button (scroll to left)
+                if ( direction == 'next') {
+                    scroll = scrollLeft + (scrollerWidth * tabsScrollAmount);
+                    if (scroll > (tabsWidth - scrollerWidth) ) {
+                        scroll = tabsWidth - scrollerWidth;
+                    }
+                }
+
+                // Animate the scroll
+                $tabsScroller.animate({
+                    scrollLeft: scroll
+                }, tabsAnimationSpeed);
+            }
+
+            // Scroll active tab into screen
+            function scrollToTab(element) {
+                if (element.parent('li').parent('ul').parent().hasClass('k-js-tabs-scroller')) {
+                    var positionLeft = element.parent().position().left,
+                        positionRight = positionLeft + element.parent().outerWidth(),
+                        parentPaddingLeft = parseInt($tabs.css('padding-left'), 10),
+                        parentPaddingRight = parseInt($tabs.css('padding-right'), 10),
+                        scrollerOffset = $tabsScroller.scrollLeft(),
+                        scrollerWidth = $tabsScroller.innerWidth(),
+                        scroll;
+
+                    // When item falls of on the right side
+                    if ( positionRight > (scrollerOffset + scrollerWidth) ) {
+                        scroll = scrollerOffset + ((positionRight - (scrollerWidth + scrollerOffset)) + (parentPaddingRight * 2));
+                    }
+
+                    // When item falls of on the left side
+                    if ( positionLeft < scrollerOffset ) {
+                        scroll = scrollerOffset - ((scrollerOffset - positionLeft) + (parentPaddingLeft * 2));
+                    }
+
+                    // Animate the scroll
+                    $tabsScroller.animate({
+                        scrollLeft: scroll
+                    }, tabsAnimationSpeed);
+                }
+            }
+
+            // Run 500ms after document ready
+            // 1. To make sure tabs are loaded
+            // 2. To display users that tabs are scrollable
+            setTimeout(function() {
+                tabsCalculateScroll();
+                tabsScrollButtonClick();
+
+                // Scroll to active tab after buttons have loaded
+                setTimeout(function() {
+                    scrollToTab($tabsScroller.find('.k-is-active a'));
+                }, tabsAnimationSpeed);
+            }, 500);
+
+            // When clicking tabs
+            $tabs.on('click', 'li a', function() {
+                scrollToTab($(this));
+            });
+
+            // Run on scrolling the tab container
+            $tabsScroller.on('scroll', function() {
+                // Throttle
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    tabsCalculateScroll();
+                }, 200);
+            });
+        }
+
+        // On window resize
+        $(window).on('resize', function() {
+            // Add class to body when resizing so we can add styling to the page
+            $('body').addClass(resizeClass);
+
+            // Throttle
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+
+                // Remove the class when resize is done
+                $('body').removeClass(resizeClass);
+
+                // Run tabs scroll function
+                tabsCalculateScroll();
+
+            }, 200);
+        });
+
     });
 
 })(kQuery);

@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 defined('JPATH_BASE') or die;
@@ -93,6 +93,7 @@ abstract class PlgKoowaFinder extends FinderIndexerAdapter
         ))->append(array(
             'layout'     => $config->entity,
             'model'      => KStringInflector::pluralize($config->entity),
+            'table'      => '#__'.$config->package.'_'.KStringInflector::pluralize($config->entity),
             'context'    => $config->package,
             'extension'  => 'com_'.$config->package,
             'type_title' => ucfirst($config->entity),
@@ -373,5 +374,21 @@ abstract class PlgKoowaFinder extends FinderIndexerAdapter
     protected function getLink(KModelEntityInterface $entity)
     {
         return sprintf('index.php?option=%s&view=%s&slug=%s', $this->extension, $this->entity, $entity->slug);
+    }
+
+    /**
+     * Only calls the plugin methods if iconv function is available
+     *
+     * This is necessary as FinderIndexerParserHtml::parse method calls iconv with no checks
+     */
+    public function update(&$args)
+    {
+        $return = null;
+
+        if (function_exists('iconv')) {
+            $return = parent::update($args);
+        }
+
+        return $return;
     }
 }

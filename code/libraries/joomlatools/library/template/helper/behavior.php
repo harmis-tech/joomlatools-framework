@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -65,6 +65,65 @@ class KTemplateHelperBehavior extends KTemplateHelperAbstract
             $html .= '<ktml:script src="assets://js/'.($config->debug ? 'build/' : 'min/').'koowa.js" />';
 
             static::setLoaded('koowa');
+        }
+
+        return $html;
+    }
+
+    /**
+     * Loads Vue.js and optionally Vuex
+     * @param array $config
+     * @return string
+     */
+    public function vue($config = array())
+    {
+        $config = new KObjectConfigJson($config);
+        $config->append([
+            'debug' => false,
+            'vuex' => true,
+            'entity' => null
+        ]);
+
+        $html = '';
+
+        if (!static::isLoaded('vue'))
+        {
+            $html .= '<ktml:script src="assets://js/'.($config->debug ? 'build/' : 'min/').'vue.js" />';
+
+            static::setLoaded('vue');
+        }
+
+        if ($config->vuex && !static::isLoaded('vuex'))
+        {
+            $html .= '<ktml:script src="assets://js/polyfill.promise.js" />';
+            $html .= '<ktml:script src="assets://js/'.($config->debug ? 'build/' : 'min/').'vuex.js" />';
+
+            static::setLoaded('vuex');
+        }
+
+        if ($config->entity instanceof KModelEntityInterface)
+        {
+            $entity = $config->entity->toArray();
+            $entity = is_numeric(key($entity)) ? current($entity) : $entity;
+            $entity['_isNew'] = $config->entity->isNew();
+            $entity['_name']  = KStringInflector::singularize($config->entity->getIdentifier()->name);
+
+            $html .= $this->koowa($config);
+            $html .= "
+            <ktml:script src=\"assets://js/koowa.vue.js\" />
+            <script>
+                kQuery(function($) {
+                    var form = $('.k-js-form-controller');
+                    
+                    if (form.length) {
+                        form.data('controller').store = Koowa.EntityStore.create({
+                            form: form,
+                            entity: ".json_encode($entity)."
+                        });
+                    }
+                });
+            </script>
+";
         }
 
         return $html;
@@ -144,7 +203,7 @@ class KTemplateHelperBehavior extends KTemplateHelperAbstract
         if ($config->javascript && !static::isLoaded('bootstrap-javascript'))
         {
             $html .= $this->jquery($config);
-            $html .= '<ktml:script src="assets://js/'.($config->debug ? '' : 'min/').'bootstrap.js" />';
+            $html .= '<ktml:script src="assets://js/'.($config->debug ? 'build/' : 'min/').'bootstrap.js" />';
 
             static::setLoaded('bootstrap-javascript');
         }
@@ -186,6 +245,30 @@ class KTemplateHelperBehavior extends KTemplateHelperAbstract
             static::setLoaded('modal');
         }
 
+        if(!static::isLoaded('modal-select2-fix'))
+        {
+            $html .= "<script>
+
+                // WORKAROUND FOR ISSUE: #873
+
+                kQuery(function($)
+                {
+                    $.magnificPopup.instance._onFocusIn = function(e)
+                    {
+                        // Do nothing if target element is select2 input
+                        if( $(e.target).hasClass('select2-search__field') ) {
+                            return true;
+                        }
+            
+                        // Else call parent method
+                        $.magnificPopup.proto._onFocusIn.call(this,e);
+                    };
+                });
+            </script>";
+
+            static::setLoaded('modal-select2-fix');
+        }
+
         $options   = (string)$config->options;
         $signature = md5('modal-'.$config->selector.$config->options_callback.$options);
 
@@ -214,6 +297,70 @@ class KTemplateHelperBehavior extends KTemplateHelperAbstract
 
         return $html;
     }
+
+    /**
+     * Keep session alive
+     *
+     * This will send an asynchronous request to the server via AJAX on an interval in secs
+     *
+     * @param   array   $config An optional array with configuration options
+     * @return string    The html output
+     */
+    public function keepalive($config = array())
+    {
+        $config = new KObjectConfigJson($config);
+        $config->append(array(
+            'refresh' => 15 * 60, //default refresh is 15min
+            'url'     => '',      //default to window.location.url
+        ));
+
+        $html = '';
+
+        // Only load once
+        if (!isset(static::$_loaded['keepalive']))
+        {
+            $session = $this->getObject('user')->getSession();
+            if($session->isActive())
+            {
+                //Get the config session lifetime (in seconds)
+                $lifetime = $session->getLifetime();
+
+                //Refresh time is 1 minute less than the lifetime
+                $refresh =  ($lifetime <= 60) ? 30 : $lifetime - 60;
+            }
+            else $refresh = (int) $config->refresh;
+
+            // Longest refresh period is one hour to prevent integer overflow.
+            if ($refresh > 3600 || $refresh <= 0) {
+                $refresh = 3600;
+            }
+
+            if(empty($config->url)) {
+                $url = 'window.location.href';
+            } else {
+                $url = "'.$config->url.'";
+            }
+
+            // Build the keep alive script.
+            $html  = $this->jquery();
+            $html .=
+                "<script>
+                (function($){
+                    var refresh = '" . $refresh . "';
+                    setInterval(function() {
+                        $.ajax({
+                            url: $url,
+                            method: 'HEAD',
+                            cache: false
+                        })
+                    }, refresh * 1000);
+                })(kQuery);</script>";
+
+            static::$_loaded['keepalive'] = true;
+        }
+        return $html;
+    }
+
 
     /**
      * Loads the Forms.Validator class and connects it to Koowa.Controller.Form
@@ -256,7 +403,7 @@ class KTemplateHelperBehavior extends KTemplateHelperAbstract
             $html .= "<script>
             kQuery(function($){
                 $('$config->selector').on('koowa:validate', function(event){
-                    if(!$(this).valid()) {
+                    if(!$(this).valid() || $(this).validate().pendingRequest !== 0) {
                         event.preventDefault();
                     }
                 }).validate($options);
@@ -682,7 +829,7 @@ class KTemplateHelperBehavior extends KTemplateHelperAbstract
 
                 $html .= "<script>
                     kQuery(function($){
-                        $('#".$config->id."').datepicker(".$options.");
+                        $('#".$config->id."').kdatepicker(".$options.");
                     });
                 </script>";
 
@@ -692,7 +839,7 @@ class KTemplateHelperBehavior extends KTemplateHelperAbstract
                         kQuery(function($){
                             $('.k-js-form-controller').on('koowa:submit', function() {
                                 var element = kQuery('#".$config->id."'),
-                                    picker  = element.data('datepicker'),
+                                    picker  = element.data('kdatepicker'),
                                     offset  = $config->offset_seconds;
 
                                 if (picker && element.children('input').val()) {
@@ -712,7 +859,7 @@ class KTemplateHelperBehavior extends KTemplateHelperAbstract
                 $config->format
             );
 
-            $html .= '<div class="k-input-group k-js-datepicker     date     " data-date-format="'.$format.'" id="'.$config->id.'">';
+            $html .= '<div class="k-input-group     date     " data-date-format="'.$format.'" id="'.$config->id.'">';
             $html .= '<input class="k-form-control" type="text" name="'.$config->name.'" value="'.$value.'"  '.$attribs.' />';
             $html .= '<span class="k-input-group__button input-group-btn">';
             $html .= '<button type="button" class="k-button k-button--default     btn     ">';
@@ -757,7 +904,7 @@ class KTemplateHelperBehavior extends KTemplateHelperAbstract
 
             $html .= '<script>
             (function($){
-                $.fn.datepicker.dates['.json_encode($config->options->language).'] = '.json_encode($locale).';
+                $.fn.kdatepicker.dates['.json_encode($config->options->language).'] = '.json_encode($locale).';
             }(kQuery));
             </script>';
 

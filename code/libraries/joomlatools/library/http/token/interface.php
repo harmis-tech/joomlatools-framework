@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -205,14 +205,13 @@ interface KHttpTokenInterface
     /**
      * Verify the token
      *
-     * This method is used to verify the digitally signed JWT token. It does nothing, if the token is not signed
-     * (i.e., the crypto segment of the JWT token is an empty string).
+     * This method is used to verify the digitally signed JWT token.
+     * It makes sure the algorithm is NOT set to 'none' if a secret is passed.
      *
      * @param mixed   $secret  The secret to be used to verify the HMAC signature bytes of the JWT token
-     * @param boolean $signed  Ensure the token is signed. If FALSE, unsigned tokens will pass verification
      * @return bool  Returns TRUE if the signature of the JWT token is valid, FALSE otherwise.
      */
-    public function verify($secret, $signed = false);
+    public function verify($secret);
 
     /**
      * Sign the token

@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -64,10 +64,25 @@ final class ComKoowaDispatcherRequest extends KDispatcherRequest
     {
         $port = parent::getPort();
 
-        if ($this->isSecure() && $port == '80') {
+        if ($this->isSecure() && in_array($port, ['80', '8080'])) {
             $port = '443';
         }
 
         return $port;
+    }
+
+    /**
+     * Checks whether the request is proxied or not.
+     *
+     * Joomla doesn't care if the X-Forwarded-By header is in a trusted list and proxies the request anyway.
+     * In return, some Joomla servers are configured to return as X-Forwarded-Proto but they are missing X-Forwarded-By.
+     *
+     * So we are turning off the checks here to run in sync with Joomla.
+     *
+     * @return bool
+     */
+    public function isProxied()
+    {
+        return true;
     }
 }

@@ -13,11 +13,12 @@
 /* Kodekit tools */
 @import "../../../../../../../../kodekit-ui/src/scss/admin/core/tools";
 
-/* Outside of the koowa scope */
+/* Outside of the k-ui-namespace scope */
 @import "site/modal";
+@import "../../../../../../../../kodekit-ui/src/scss/admin/molecules/datepicker";
 
-@import "../../../../../../../node_modules/select2/src/scss/core";
-@import "../../../../../../../node_modules/select2-bootstrap-theme/src/select2-bootstrap";
+@import "../../../../../../../../kodekit-ui/node_modules/select2/src/scss/core";
+@import "../../../../../../../../kodekit-ui/node_modules/select2-bootstrap-theme/src/select2-bootstrap";
 
 /* Icons */
 @import "../../../../../../../../kodekit-ui/src/scss/admin/utilities/k-icons";
@@ -26,8 +27,8 @@
 /* Tooltips */
 @import "../../../../../../../../kodekit-ui/src/scss/admin/molecules/tooltip";
 
-/* Inside koowa scope */
-.koowa {
+/* Inside k-ui-namespace scope */
+.k-ui-namespace {
 
   /* Border-box size everything */
 

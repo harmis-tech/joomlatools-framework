@@ -1,10 +1,10 @@
 <?php
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright   Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright   Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link        https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link        https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 /**
@@ -119,7 +119,7 @@ abstract class KTemplateEngineAbstract extends KTemplateAbstract implements KTem
         {
             $path = $this->_cache_path;
 
-            if(!is_dir($path) && (false === @mkdir($path, 0777, true) && !is_dir($path)))
+            if(!is_dir($path) && (false === @mkdir($path, 0755, true) && !is_dir($path)))
             {
                 if($this->isDebug()) {
                     throw new RuntimeException(sprintf('The template cache path "%s" does not exist', $path));
@@ -137,7 +137,7 @@ abstract class KTemplateEngineAbstract extends KTemplateAbstract implements KTem
                 }
             }
 
-            $hash = crc32($name);
+            $hash = crc32($name.PHP_VERSION);
             $file = $path.'/template_'.$hash.'.php';
 
             if(@file_put_contents($file, $source) === false)
@@ -227,7 +227,7 @@ abstract class KTemplateEngineAbstract extends KTemplateAbstract implements KTem
 
         if($this->_cache)
         {
-            $hash   = crc32($file);
+            $hash   = crc32($file.PHP_VERSION);
             $cache  = $this->_cache_path.'/template_'.$hash.'.php';
             $result = is_file($cache) ? $cache : false;
 

@@ -607,7 +607,7 @@ window.jQuery = window.kQuery;
                     tooltip = tooltip.replace('%s', item.data('title'));
 
                     dropdown_button.ktooltip({
-                        "container":".koowa-container",
+                        "container":".k-ui-container",
                         "delay":{"show":500,"hide":50},
                         'title': tooltip
                     });
@@ -831,11 +831,11 @@ window.jQuery = window.kQuery;
 
 } (window, document, kQuery));
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
  * @copyright	Copyright (C) 2015 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link		https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link		https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 if(!Koowa) {
@@ -1000,11 +1000,11 @@ Koowa.Class = klass({
 })(window.kQuery);
 
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
  * @copyright	Copyright (C) 2015 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link		https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link		https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 if (typeof Koowa === 'undefined') {
@@ -1173,11 +1173,11 @@ $(function() {
 
 })(window.kQuery);
 /**
- * Nooku Framework - http://nooku.org/framework
+ * Joomlatools Framework - https://www.joomlatools.com/developer/framework/
  *
- * @copyright	Copyright (C) 2007 - 2014 Johan Janssens and Timble CVBA. (http://www.timble.net)
+ * @copyright	Copyright (C) 2007 Johan Janssens and Timble CVBA. (http://www.timble.net)
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link		https://github.com/nooku/nooku-framework for the canonical source repository
+ * @link		https://github.com/joomlatools/joomlatools-framework for the canonical source repository
  */
 
 if(!Koowa) {
@@ -1542,7 +1542,7 @@ Koowa.Controller.Grid = Koowa.Controller.extend({
                 context.data   = data;
                 context.action = options.action;
 
-                action.on(eventType+'.koowa', function(){
+                action.on(eventType+'.k-ui-namespace', function(){
                     checkboxes.prop('checked', '');
                     checkbox.prop('checked', 'checked');
                     checkboxes.trigger('change', true);
@@ -1606,5 +1606,6 @@ Koowa.Controller.Form = Koowa.Controller.extend({
 });
 
 })(window.kQuery);
+
 window.jQuery = globalCacheForjQueryReplacement;
 globalCacheForjQueryReplacement = undefined;
